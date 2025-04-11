@@ -1,0 +1,78 @@
+<%- include('../partials/header', { title: title }) %>
+
+<div class="d-flex" id="wrapper">
+
+    <%- include('../partials/sidebar', { username: username, activePage: activePage }) %>
+
+    <!-- Page Content Wrapper -->
+    <div id="page-content-wrapper">
+    
+        <%- include('../partials/navbar', { username: username }) %>
+
+        <!-- Page content-->
+        <div class="container-fluid p-4">
+            <h1 class="mt-4">Settings</h1>
+            <p>Manage your account settings.</p>
+
+            <!-- Wrap cards in a centered column -->
+            <div class="row justify-content-center mt-4">
+                <div class="col-lg-8 col-md-10">
+
+                    <!-- User Information Card -->
+                    <div class="mb-4">
+                        <div class="card shadow">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary"><i class="bi bi-person-badge me-2"></i>User Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row">
+                                    <dt class="col-sm-4">Username:</dt>
+                                    <dd class="col-sm-8"><%= userInfo.username %></dd>
+
+                                    <dt class="col-sm-4">Email:</dt>
+                                    <dd class="col-sm-8"><%= userInfo.email %></dd>
+
+                                    <dt class="col-sm-4">Member Since:</dt>
+                                    <dd class="col-sm-8"><%= new Date(userInfo.created_at).toLocaleDateString() %></dd>
+                                </dl>
+                                <!-- Add other user profile fields/edit options here later if needed -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Change Password Card -->
+                    <div class="mb-4">
+                        <div class="card shadow">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary"><i class="bi bi-shield-lock me-2"></i>Change Password</h6>
+                            </div>
+                            <div class="card-body">
+                                <form action="/settings/change-password" method="POST">
+                                    <div class="mb-3">
+                                        <label for="currentPassword" class="form-label">Current Password</label>
+                                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="newPassword" class="form-label">New Password</label>
+                                        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="bi bi-key-fill me-2"></i>Update Password
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> <!-- End centered column -->
+            </div> <!-- End row -->
+        
+        </div> <!-- End container-fluid -->
+    </div> <!-- End page-content-wrapper -->
+</div> <!-- End wrapper -->
+
+<%- include('../partials/footer') %> 

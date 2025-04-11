@@ -1,0 +1,197 @@
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<!-- Optional: Add custom JS files later -->
+<!-- <script src="/js/scripts.js"></script> -->
+
+<!-- SweetAlert2 Library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Output Flash Message Script -->
+<%- locals.flashScript ? flashScript : '' %>
+
+<!-- SweetAlert Confirmation Helpers -->
+<script>
+    function confirmDelete(type, id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `You won't be able to revert this! You are about to delete this ${type}.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Find the corresponding form and submit it
+                const form = document.getElementById(`delete-${type}-form-${id}`);
+                if (form) {
+                    form.submit();
+                } else {
+                    console.error(`Form not found: delete-${type}-form-${id}`);
+                    // Optionally show an error to the user
+                    Swal.fire('Error', 'Could not find the form to submit.', 'error');
+                }
+            }
+        });
+    }
+
+    function confirmAction(actionText, formId, confirmButtonColor = '#3085d6', confirmButtonText = 'Yes, proceed!') {
+        Swal.fire({
+            title: 'Confirm Action', // More generic title
+            text: `Are you sure you want to ${actionText}?`,
+            icon: 'question', // Question icon for general actions
+            showCancelButton: true,
+            confirmButtonColor: confirmButtonColor,
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: confirmButtonText
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.getElementById(formId);
+                if (form) {
+                    form.submit();
+                } else {
+                    console.error(`Form not found: ${formId}`);
+                    Swal.fire('Error', 'Could not find the form to submit.', 'error');
+                }
+            }
+        });
+    }
+</script>
+
+<!-- Global Chart Initialization Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        function parseJsonData(element, attributeName) {
+            if (!element) {
+                console.warn(`Element not found when looking for attribute '${attributeName}'.`);
+                return null;
+            }
+            const rawData = element.dataset[attributeName];
+            console.log(`Reading data for attribute '${attributeName}':`, rawData);
+            if (rawData === undefined || rawData === null) {
+                console.warn(`Data attribute '${attributeName}' not found on element`, element);
+                return null;
+            }
+            try {
+                const cleanedJson = rawData.replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+                const parsedData = JSON.parse(cleanedJson);
+                console.log(`Successfully parsed data for '${attributeName}':`, parsedData);
+                return parsedData;
+            } catch (e) {
+                console.error(`Error parsing JSON from data attribute '${attributeName}':`, e, rawData);
+                return null;
+            }
+        }
+
+        // Initialize charts only if their corresponding canvas elements exist on the page
+
+        // --- Appointment Status Chart (reports page) ---
+        const statusCanvas = document.getElementById('appointmentStatusChart');
+        if (statusCanvas) {
+            const statusData = parseJsonData(statusCanvas, 'statusData');
+            if (statusData) {
+                new Chart(statusCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: { labels: ['Scheduled', 'Completed', 'Cancelled'], datasets: [{ label: 'Appointments', data: statusData, backgroundColor: ['rgb(54, 162, 235)', 'rgb(75, 192, 192)', 'rgb(255, 99, 132)'], hoverOffset: 4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
+                });
+            }
+        }
+
+        // --- Patient Gender Chart (reports page) ---
+        const genderCanvas = document.getElementById('patientGenderChart');
+        if (genderCanvas) {
+            const genderLabels = parseJsonData(genderCanvas, 'genderLabels');
+            const genderData = parseJsonData(genderCanvas, 'genderData');
+            if (genderLabels && genderData && genderLabels.length > 0) {
+                new Chart(genderCanvas.getContext('2d'), {
+                    type: 'pie',
+                    data: { labels: genderLabels, datasets: [{ label: 'Patients', data: genderData, backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)'], hoverOffset: 4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
+                });
+            }
+        }
+
+        // --- Patient Age Chart (reports page) ---
+        const ageCanvas = document.getElementById('patientAgeChart');
+        if (ageCanvas) {
+            const ageLabels = parseJsonData(ageCanvas, 'ageLabels');
+            const ageData = parseJsonData(ageCanvas, 'ageData');
+            if (ageLabels && ageData && ageLabels.length > 0) {
+                new Chart(ageCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: { labels: ageLabels, datasets: [{ label: 'Number of Patients', data: ageData, backgroundColor: 'rgba(75, 192, 192, 0.6)', borderColor: 'rgba(75, 192, 192, 1)', borderWidth: 1 }] },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
+                });
+            }
+        }
+
+        // --- Appointment Trend Chart (reports page) ---
+        const apptTrendCanvas = document.getElementById('appointmentTrendChart');
+        if (apptTrendCanvas) {
+            const trendLabels = parseJsonData(apptTrendCanvas, 'trendLabels');
+            const apptTrendData = parseJsonData(apptTrendCanvas, 'trendData');
+            if (trendLabels && apptTrendData) {
+                new Chart(apptTrendCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: { labels: trendLabels, datasets: [{ label: 'Appointments Booked', data: apptTrendData, fill: false, borderColor: 'rgb(75, 192, 192)', tension: 0.1 }] },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
+                });
+            }
+        }
+
+        // --- New Patient Trend Chart (reports page) ---
+        const patientTrendCanvas = document.getElementById('newPatientTrendChart');
+        if (patientTrendCanvas) {
+            const patientTrendLabels = parseJsonData(patientTrendCanvas, 'trendLabels'); // May need shared labels
+            const patientTrendData = parseJsonData(patientTrendCanvas, 'patientTrendData');
+            if (patientTrendLabels && patientTrendData) {
+                // If trendLabels from apptTrendCanvas is needed and apptTrendCanvas exists, use those
+                const labelsToUse = patientTrendLabels || (document.getElementById('appointmentTrendChart') ? parseJsonData(document.getElementById('appointmentTrendChart'), 'trendLabels') : null);
+                if (labelsToUse) {
+                     new Chart(patientTrendCanvas.getContext('2d'), {
+                        type: 'line',
+                        data: { labels: labelsToUse, datasets: [{ label: 'New Patients Added', data: patientTrendData, fill: false, borderColor: 'rgb(54, 162, 235)', tension: 0.1 }] },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
+                    });
+                }
+            }
+        }
+
+        // --- Forecast Chart (dashboard page) --- ADDED
+        const forecastCanvas = document.getElementById('forecastChart');
+        if (forecastCanvas) {
+            const forecastLabels = parseJsonData(forecastCanvas, 'forecastLabels');
+            const forecastData = parseJsonData(forecastCanvas, 'forecastData');
+            if (forecastLabels && forecastData) {
+                 new Chart(forecastCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: forecastLabels,
+                        datasets: [{
+                            label: 'Scheduled Appointments',
+                            data: forecastData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)', // Blue
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+        }
+
+    });
+</script>
+
+</body>
+</html> 

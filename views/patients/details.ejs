@@ -1,0 +1,127 @@
+<%- include('../partials/header', { title: title }) %>
+
+<div class="d-flex" id="wrapper">
+
+    <%- include('../partials/sidebar', { username: username, activePage: activePage }) %>
+
+    <!-- Page Content Wrapper -->
+    <div id="page-content-wrapper">
+    
+        <%- include('../partials/navbar', { username: username }) %>
+
+        <!-- Page content-->
+        <div class="container-fluid p-4">
+
+            <!-- Patient Header -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800"><%= patient.first_name %> <%= patient.last_name %> <span class="h5 text-muted">(ID: <%= patient.id %>)</span></h1>
+                <div>
+                     <a href="/patients/edit/<%= patient.id %>" class="btn btn-sm btn-warning shadow-sm me-2">
+                        <i class="bi bi-pencil-square me-1"></i> Edit Patient
+                    </a>
+                     <a href="/appointments/add?patient_id=<%= patient.id %>" class="btn btn-sm btn-primary shadow-sm">
+                        <i class="bi bi-calendar-plus-fill me-1"></i> Book Appointment
+                    </a>
+                     <!-- Add Delete button here if needed, with confirmation -->
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Patient Details Card -->
+                <div class="col-lg-5 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Patient Information</h6>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Full Name:</dt>
+                                <dd class="col-sm-8"><%= patient.first_name %> <%= patient.last_name %></dd>
+
+                                <dt class="col-sm-4">Date of Birth:</dt>
+                                <dd class="col-sm-8"><%= patient.formatted_dob ? patient.formatted_dob + (patient.age !== null ? ` (Age: ${patient.age})` : '') : '-' %></dd>
+
+                                <dt class="col-sm-4">Gender:</dt>
+                                <dd class="col-sm-8"><%= patient.gender || '-' %></dd>
+
+                                <dt class="col-sm-4">Contact:</dt>
+                                <dd class="col-sm-8"><%= patient.contact_number || '-' %></dd>
+
+                                <dt class="col-sm-4">Email:</dt>
+                                <dd class="col-sm-8"><%- patient.email ? `<a href="mailto:${patient.email}">${patient.email}</a>` : '-' %></dd>
+
+                                <dt class="col-sm-4">Address:</dt>
+                                <dd class="col-sm-8"><%- patient.address ? patient.address.replace(/\n/g, '<br>') : '-' %></dd> <!-- Display line breaks -->
+                                
+                                <dt class="col-sm-4">Added On:</dt>
+                                <dd class="col-sm-8"><%= new Date(patient.created_at).toLocaleDateString() %></dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medical History Card -->
+                 <div class="col-lg-7 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Medical History / Notes</h6>
+                        </div>
+                        <div class="card-body" style="white-space: pre-wrap;"> <!-- Preserve whitespace/newlines -->
+                             <%- patient.medical_history || '<p class="text-muted">No medical history recorded.</p>' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             <!-- Appointment History Card -->
+            <div class="row">
+                <div class="col-lg-12 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Appointment History</h6>
+                        </div>
+                        <div class="card-body">
+                            <% if (appointments && appointments.length > 0) { %>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped table-hover" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th>Date & Time</th>
+                                                <th>Reason</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <% appointments.forEach(appt => { %>
+                                            <tr>
+                                                <td><%= appt.formatted_date %></td>
+                                                <td><%= appt.reason || '-' %></td>
+                                                <td>
+                                                    <span class="badge bg-<%= appt.status === 'Completed' ? 'success' : (appt.status === 'Cancelled' ? 'danger' : 'primary') %>">
+                                                        <%= appt.status %>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a href="/appointments/edit/<%= appt.id %>" class="btn btn-sm btn-outline-warning py-0 px-1" title="Edit Appointment">
+                                                         <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                             <% } else { %>
+                                <p class="text-muted mb-0">No past or future appointments found for this patient.</p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- End container-fluid -->
+    </div> <!-- End page-content-wrapper -->
+</div> <!-- End wrapper -->
+
+<%- include('../partials/footer') %> 

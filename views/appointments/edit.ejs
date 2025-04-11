@@ -1,0 +1,81 @@
+<%- include('../partials/header', { title: title }) %>
+
+<div class="d-flex" id="wrapper">
+
+    <%- include('../partials/sidebar', { username: username, activePage: activePage }) %>
+
+    <!-- Page Content Wrapper -->
+    <div id="page-content-wrapper">
+    
+        <%- include('../partials/navbar', { username: username }) %>
+
+        <!-- Page content-->
+        <div class="container-fluid p-4">
+            <h1 class="mt-4">Edit Appointment</h1>
+            <p>Update the details for the appointment below.</p>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Appointment Details</h6>
+                </div>
+                <div class="card-body">
+
+                    <% if (typeof error !== 'undefined' && error) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <%= error %>
+                        </div>
+                    <% } %>
+
+                    <form action="/appointments/edit/<%= appointment.id %>" method="POST">
+                        <div class="mb-3">
+                            <label for="patient_id" class="form-label">Patient <span class="text-danger">*</span></label>
+                            <select class="form-select" id="patient_id" name="patient_id" required>
+                                <option value="" disabled>Select a patient...</option>
+                                <% if (typeof patients !== 'undefined' && patients.length > 0) { %>
+                                    <% patients.forEach(patient => { %>
+                                        <option value="<%= patient.id %>"
+                                            <%= (appointment.patient_id == patient.id) ? 'selected' : '' %>>
+                                            <%= patient.last_name %>, <%= patient.first_name %>
+                                        </option>
+                                    <% }) %>
+                                <% } else { %>
+                                    <option value="" disabled>No patients available.</option>
+                                <% } %>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="appointment_date" class="form-label">Appointment Date & Time <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="appointment_date" name="appointment_date" value="<%= appointment.datetime_local_format %>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">Reason for Appointment</label>
+                            <textarea class="form-control" id="reason" name="reason" rows="3"><%= appointment.reason || '' %></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="Scheduled" <%= appointment.status === 'Scheduled' ? 'selected' : '' %>>Scheduled</option>
+                                <option value="Completed" <%= appointment.status === 'Completed' ? 'selected' : '' %>>Completed</option>
+                                <option value="Cancelled" <%= appointment.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                <!-- Add other statuses if needed -->
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-success me-2">
+                             <i class="bi bi-check-circle me-2"></i>Update Appointment
+                        </button>
+                        <a href="/appointments" class="btn btn-secondary">
+                            <i class="bi bi-x-circle me-2"></i>Cancel
+                        </a>
+                    </form>
+                </div>
+            </div>
+        
+        </div> <!-- End container-fluid -->
+    </div> <!-- End page-content-wrapper -->
+</div> <!-- End wrapper -->
+
+<%- include('../partials/footer') %> 

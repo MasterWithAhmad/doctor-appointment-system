@@ -1,0 +1,203 @@
+<%- include('./partials/header', { title: title }) %>
+
+<div class="d-flex" id="wrapper">
+
+    <%- include('./partials/sidebar', { username: username, activePage: activePage }) %>
+
+    <!-- Page Content Wrapper -->
+    <div id="page-content-wrapper">
+
+        <%- include('./partials/navbar', { username: username }) %>
+
+        <!-- Page content-->
+        <div class="container-fluid p-4">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+                <div>
+                    <a href="/appointments/add" class="btn btn-sm btn-primary shadow-sm me-2">
+                        <i class="bi bi-calendar-plus-fill me-1"></i> New Appointment
+                    </a>
+                     <a href="/patients/add" class="btn btn-sm btn-success shadow-sm">
+                         <i class="bi bi-person-plus-fill me-1"></i> New Patient
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stat Cards Row -->
+            <div class="row">
+                <!-- Appointments Card -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Appointments (Today)</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800"><%= stats.todayAppointments %></div>
+                                    <div class="text-xs text-success">Completed: <%= stats.completedToday %></div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-calendar-check-fill fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Total Patients Card -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Patients</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800"><%= stats.totalPatients %></div>
+                                    <div class="text-xs text-info">New This Week: <%= stats.newPatientsWeek %></div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-people-fill fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scheduled Appointments Card -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Scheduled Appointments</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800"><%= stats.scheduledAppointments %></div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-calendar3 fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming (Next 7 days) Card -->
+                 <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Upcoming (Next 7 Days)</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800"><%= stats.upcomingAppointments %></div>
+                                </div>
+                                <div class="col-auto">
+                                     <i class="bi bi-calendar-event-fill fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row for Schedule, Forecast, Past Due -->
+            <div class="row">
+
+                 <!-- Today's Schedule Column -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Today's Schedule</h6>
+                        </div>
+                        <div class="card-body">
+                            <% if (todaysSchedule && todaysSchedule.length > 0) { %>
+                                <ul class="list-group list-group-flush">
+                                    <% todaysSchedule.forEach(appt => { %>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                            <div class="me-auto">
+                                                <strong><%= appt.time %></strong> -
+                                                <a href="/patients/details/<%= appt.patient_id %>" title="View Patient Details">
+                                                    <%= appt.patient_name %>
+                                                </a>
+                                                <% if (appt.reason) { %>
+                                                    <small class="text-muted d-block ms-5">Reason: <%= appt.reason %></small>
+                                                <% } %>
+                                            </div>
+                                            <div class="mt-2 mt-md-0">
+                                                <span class="badge bg-<%= appt.status === 'Completed' ? 'success' : (appt.status === 'Cancelled' ? 'danger' : 'info') %> me-2"><%= appt.status %></span>
+                                                <!-- Quick Actions -->
+                                                <a href="/appointments/edit/<%= appt.id %>" class="btn btn-sm btn-outline-secondary py-0 px-1 me-1" title="Edit Appointment">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <% if (appt.status === 'Scheduled') { %>
+                                                    <form action="/appointments/mark-complete/<%= appt.id %>" method="POST" class="d-inline me-1" id="dash-complete-form-<%= appt.id %>">
+                                                        <button type="button" class="btn btn-sm btn-outline-success py-0 px-1" title="Mark Complete" onclick="confirmAction('mark this appointment as Complete', 'dash-complete-form-<%= appt.id %>', '#198754', 'Yes, mark complete')">
+                                                            <i class="bi bi-check-lg"></i>
+                                                        </button>
+                                                    </form>
+                                                    <form action="/appointments/cancel/<%= appt.id %>" method="POST" class="d-inline" id="dash-cancel-form-<%= appt.id %>">
+                                                         <button type="button" class="btn btn-sm btn-outline-warning py-0 px-1" title="Cancel Appointment" onclick="confirmAction('cancel this appointment', 'dash-cancel-form-<%= appt.id %>', '#ffc107', 'Yes, cancel')">
+                                                            <i class="bi bi-x-lg"></i>
+                                                        </button>
+                                                    </form>
+                                                <% } %>
+                                            </div>
+                                        </li>
+                                    <% }) %>
+                                </ul>
+                            <% } else { %>
+                                <p class="text-muted mb-0">No appointments scheduled for today.</p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forecast & Past Due Column -->
+                <div class="col-lg-6 mb-4">
+                    <!-- Forecast Card -->
+                    <div class="card shadow mb-4">
+                         <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Appointment Forecast (Next 5 Days)</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="position: relative; height:150px">
+                                <canvas id="forecastChart"
+                                        data-forecast-labels='<%- JSON.stringify(forecastLabels || []) %>'
+                                        data-forecast-data='<%- JSON.stringify(forecastData || []) %>'>
+                                </canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Needs Attention Card -->
+                     <div class="card shadow border-left-danger">
+                         <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-danger">Needs Attention</h6>
+                        </div>
+                        <div class="card-body">
+                             <% if (pastDueAppointments && pastDueAppointments.length > 0) { %>
+                                 <p class="text-xs font-weight-bold text-danger text-uppercase mb-2">Past Due Scheduled Appointments</p>
+                                <ul class="list-group list-group-flush">
+                                    <% pastDueAppointments.forEach(appt => { %>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                 <small><%= appt.formatted_date %></small> -
+                                                 <a href="/patients/details/<%= appt.patient_id %>" title="View Patient"><%= appt.patient_name %></a>
+                                            </div>
+                                            <a href="/appointments/edit/<%= appt.id %>" class="btn btn-sm btn-outline-secondary py-0 px-1" title="View/Edit Appointment">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        </li>
+                                    <% }) %>
+                                </ul>
+                            <% } else { %>
+                                <p class="text-muted mb-0">Nothing seems to need immediate attention.</p>
+                            <% } %>
+                            <!-- Add other attention items here later -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- End container-fluid -->
+    </div> <!-- End page-content-wrapper -->
+</div> <!-- End wrapper -->
+
+<%- include('./partials/footer') %>
+<!-- Chart script will be added to footer --> 

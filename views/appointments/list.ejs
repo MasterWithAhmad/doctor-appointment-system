@@ -1,0 +1,180 @@
+<%- include('../partials/header', { title: title }) %>
+
+<div class="d-flex" id="wrapper">
+
+    <%- include('../partials/sidebar', { username: username, activePage: activePage }) %>
+
+    <!-- Page Content Wrapper -->
+    <div id="page-content-wrapper">
+    
+        <%- include('../partials/navbar', { username: username }) %>
+
+        <!-- Page content-->
+        <div class="container-fluid p-4">
+            <h1 class="mt-4">Appointments</h1>
+            <p>Manage your scheduled appointments.</p>
+
+            <!-- Filters Form -->
+            <form action="/appointments" method="GET" class="mb-3">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                        <label for="search_patient" class="form-label visually-hidden">Search Patient</label>
+                        <input type="text" name="search_patient" id="search_patient" class="form-control form-control-sm" placeholder="Search by patient name..." value="<%= typeof searchPatient !== 'undefined' ? searchPatient : '' %>">
+                    </div>
+                     <div class="col-md-3">
+                        <label for="status" class="form-label visually-hidden">Filter by Status</label>
+                        <select name="status" id="status" class="form-select form-select-sm">
+                            <option value="" <%= (typeof filterStatus === 'undefined' || !filterStatus) ? 'selected' : '' %>>All Statuses</option>
+                            <option value="Scheduled" <%= (typeof filterStatus !== 'undefined' && filterStatus === 'Scheduled') ? 'selected' : '' %>>Scheduled</option>
+                            <option value="Completed" <%= (typeof filterStatus !== 'undefined' && filterStatus === 'Completed') ? 'selected' : '' %>>Completed</option>
+                            <option value="Cancelled" <%= (typeof filterStatus !== 'undefined' && filterStatus === 'Cancelled') ? 'selected' : '' %>>Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-auto">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-funnel-fill"></i> Filter
+                        </button>
+                         <% if ((typeof searchPatient !== 'undefined' && searchPatient) || (typeof filterStatus !== 'undefined' && filterStatus)) { %>
+                            <a href="/appointments" class="btn btn-sm btn-outline-secondary ms-1">Clear</a>
+                        <% } %>
+                    </div>
+                    <div class="col-md text-md-end">
+                         <a href="/appointments/add" class="btn btn-sm btn-primary">
+                             <i class="bi bi-plus-circle me-1"></i> Add New Appointment
+                         </a>
+                    </div>
+                </div>
+            </form>
+
+            <% if (typeof errorMsg !== 'undefined' && errorMsg) { %>
+                <div class="alert alert-danger" role="alert"><%= errorMsg %></div>
+            <% } %>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Appointment List</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Patient Name</th>
+                                    <th>Date & Time</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (appointments && appointments.length > 0) { %>
+                                    <% appointments.forEach(appointment => { %>
+                                        <tr>
+                                            <td>
+                                                <% if (appointment.patient_id) { %>
+                                                    <a href="/patients/details/<%= appointment.patient_id %>" title="View Patient Details">
+                                                        <%= appointment.patient_name || 'Unknown Patient' %>
+                                                    </a>
+                                                <% } else { %>
+                                                    <%= appointment.patient_name || 'Unknown Patient' %>
+                                                <% } %>
+                                            </td>
+                                            <td><%= appointment.formatted_date %></td>
+                                            <td><%= appointment.reason || '-' %></td>
+                                            <td>
+                                                <span class="badge bg-<%= appointment.status === 'Completed' ? 'success' : (appointment.status === 'Cancelled' ? 'danger' : 'primary') %>">
+                                                    <%= appointment.status %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <!-- Edit Button -->
+                                                <a href="/appointments/edit/<%= appointment.id %>" class="btn btn-sm btn-primary me-1" title="Edit Appointment">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+
+                                                <% if (appointment.status === 'Scheduled') { %>
+                                                    <!-- Mark Complete Button -->
+                                                    <form action="/appointments/mark-complete/<%= appointment.id %>" method="POST" class="d-inline" id="complete-appointment-form-<%= appointment.id %>">
+                                                        <button type="button" class="btn btn-sm btn-success me-1" title="Mark Complete" 
+                                                                onclick="confirmAction('mark this appointment as Complete', 'complete-appointment-form-<%= appointment.id %>', '#198754', 'Yes, mark complete')">
+                                                            <i class="bi bi-check-circle"></i>
+                                                        </button>
+                                                    </form>
+                                                    <!-- Cancel Button -->
+                                                    <form action="/appointments/cancel/<%= appointment.id %>" method="POST" class="d-inline" id="cancel-appointment-form-<%= appointment.id %>">
+                                                        <button type="button" class="btn btn-sm btn-warning me-1" title="Cancel Appointment" 
+                                                                onclick="confirmAction('cancel this appointment', 'cancel-appointment-form-<%= appointment.id %>', '#ffc107', 'Yes, cancel')">
+                                                            <i class="bi bi-x-circle"></i>
+                                                        </button>
+                                                    </form>
+                                                <% } %>
+                                                <% if (appointment.status === 'Completed' || appointment.status === 'Cancelled') { %>
+                                                    <!-- Delete Button (Only if not Scheduled) -->
+                                                    <form action="/appointments/delete/<%= appointment.id %>" method="POST" class="d-inline" id="delete-appointment-form-<%= appointment.id %>">
+                                                        <button type="button" class="btn btn-sm btn-danger" title="Delete Appointment" 
+                                                                onclick="confirmDelete('appointment', '<%= appointment.id %>')">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="5" class="text-center">No appointments found.</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination Controls -->
+                    <% if (totalPages > 1) { %>
+                        <nav aria-label="Appointment list navigation">
+                            <ul class="pagination pagination-sm justify-content-center">
+                                <% 
+                                    // Build query string for pagination links, preserving filters
+                                    let queryParams = [];
+                                    if (searchPatient) queryParams.push(`search_patient=${encodeURIComponent(searchPatient)}`);
+                                    if (filterStatus) queryParams.push(`status=${encodeURIComponent(filterStatus)}`);
+                                    const queryString = queryParams.length > 0 ? '&' + queryParams.join('&') : '';
+                                %>
+                                <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                    <a class="page-link" href="/appointments?page=<%= currentPage - 1 %><%= queryString %>" aria-label="Previous">&laquo;</a>
+                                </li>
+                                <% 
+                                const maxLinks = 5;
+                                let startPage = Math.max(1, currentPage - Math.floor(maxLinks / 2));
+                                let endPage = Math.min(totalPages, startPage + maxLinks - 1);
+                                if (endPage - startPage + 1 < maxLinks) { startPage = Math.max(1, endPage - maxLinks + 1); }
+                                %>
+                                <% if (startPage > 1) { %>
+                                    <li class="page-item"><a class="page-link" href="/appointments?page=1<%= queryString %>">1</a></li>
+                                    <% if (startPage > 2) { %><li class="page-item disabled"><span class="page-link">...</span></li><% } %>
+                                <% } %>
+                                <% for (let i = startPage; i <= endPage; i++) { %>
+                                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                        <a class="page-link" href="/appointments?page=<%= i %><%= queryString %>"><%= i %></a>
+                                    </li>
+                                <% } %>
+                                <% if (endPage < totalPages) { %>
+                                     <% if (endPage < totalPages - 1) { %><li class="page-item disabled"><span class="page-link">...</span></li><% } %>
+                                    <li class="page-item"><a class="page-link" href="/appointments?page=<%= totalPages %><%= queryString %>"><%= totalPages %></a></li>
+                                <% } %>
+                                <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                    <a class="page-link" href="/appointments?page=<%= currentPage + 1 %><%= queryString %>" aria-label="Next">&raquo;</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    <% } %>
+                    <!-- End Pagination Controls -->
+                    
+                </div> <!-- End card-body -->
+            </div> <!-- End card -->
+        
+        </div> <!-- End container-fluid -->
+    </div> <!-- End page-content-wrapper -->
+</div> <!-- End wrapper -->
+
+<%- include('../partials/footer') %> 

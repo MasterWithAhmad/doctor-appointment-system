@@ -1,0 +1,96 @@
+/* Basic body padding to prevent content touching edges */
+body {
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Sidebar specific styles */
+#sidebar-wrapper {
+    min-height: 100vh;
+    margin-left: -15rem; /* Start hidden */
+    transition: margin 0.25s ease-out;
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar-wrapper .sidebar-heading {
+    padding: 0.875rem 1.25rem;
+    font-size: 1.2rem;
+}
+
+#sidebar-wrapper .list-group {
+    width: 15rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+#page-content-wrapper {
+    /* min-width: 100vw; */ /* This rule causes the content to wrap below the sidebar */
+}
+
+/* Toggled state for sidebar */
+body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
+    margin-left: 0;
+}
+
+/* Adjust page content wrapper when sidebar is toggled */
+@media (min-width: 768px) { /* Apply only on medium screens and up */
+    #sidebar-wrapper {
+        margin-left: 0;
+    }
+
+    #page-content-wrapper {
+        min-width: 0;
+        width: 100%;
+    }
+
+    body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
+        margin-left: -15rem; /* Hide on toggle */
+    }
+}
+
+/* Simple card border colors (match dashboard examples) */
+.border-left-primary {
+    border-left: .25rem solid #4e73df!important;
+}
+
+.border-left-success {
+    border-left: .25rem solid #1cc88a!important;
+}
+
+.border-left-info {
+    border-left: .25rem solid #36b9cc!important;
+}
+
+.text-xs {
+    font-size: .7rem;
+}
+
+.text-gray-300 {
+    color: #dddfeb!important;
+}
+.text-gray-800 {
+    color: #5a5c69!important;
+}
+
+/* Center login/register forms */
+.container.vh-100 {
+    min-height: 100vh;
+}
+
+.card.shadow {
+    box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15)!important;
+}
+
+/* Ensure logout link in sidebar stays at bottom */
+#sidebar-wrapper .list-group-item.mt-auto {
+    margin-top: auto!important;
+}
+
+/* Active sidebar link styling */
+.list-group-item.active {
+    z-index: 2;
+    color: #fff;
+    background-color: #0d6efd; /* Bootstrap primary color */
+    border-color: #0d6efd;
+} 

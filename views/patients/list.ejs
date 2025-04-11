@@ -1,0 +1,145 @@
+<%- include('../partials/header', { title: title }) %>
+
+<div class="d-flex" id="wrapper">
+
+    <%- include('../partials/sidebar', { username: username, activePage: activePage }) %>
+
+    <!-- Page Content Wrapper -->
+    <div id="page-content-wrapper">
+    
+        <%- include('../partials/navbar', { username: username }) %>
+
+        <!-- Page content-->
+        <div class="container-fluid p-4">
+            <h1 class="mt-4">Patients</h1>
+            <p>Manage your patient records.</p>
+
+            <!-- Search Form -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                     <form action="/patients" method="GET" class="d-flex">
+                        <input type="text" name="search" class="form-control me-2" placeholder="Search by name..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+                        <button type="submit" class="btn btn-outline-primary">
+                             <i class="bi bi-search"></i> Search
+                        </button>
+                        <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+                            <a href="/patients" class="btn btn-outline-secondary ms-2">Clear</a>
+                        <% } %>
+                    </form>
+                </div>
+                <div class="col-md-6 text-md-end">
+                     <a href="/patients/add" class="btn btn-primary">
+                         <i class="bi bi-person-plus-fill me-2"></i>Add New Patient
+                    </a>
+                </div>
+            </div>
+
+            <% if (typeof errorMsg !== 'undefined' && errorMsg) { %>
+                <div class="alert alert-danger" role="alert"><%= errorMsg %></div>
+            <% } %>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Patient List</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover" id="dataTablePatients" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Age</th>
+                                    <th>Gender</th>
+                                    <th>Contact Number</th>
+                                    <th>Email</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (patients && patients.length > 0) { %>
+                                    <% patients.forEach(patient => { %>
+                                        <tr>
+                                            <td><%= patient.first_name %> <%= patient.last_name %></td>
+                                            <td><%= patient.age !== null ? patient.age : '-' %></td>
+                                            <td><%= patient.gender || '-' %></td>
+                                            <td><%= patient.contact_number || '-' %></td>
+                                            <td><%= patient.email || '-' %></td>
+                                            <td>
+                                                <!-- View Details Button -->
+                                                <a href="/patients/details/<%= patient.id %>" class="btn btn-sm btn-info me-1" title="View Details">
+                                                    <i class="bi bi-eye-fill"></i>
+                                                </a>
+                                                <!-- Book Appointment Button -->
+                                                <a href="/appointments/add?patient_id=<%= patient.id %>" class="btn btn-sm btn-secondary me-1" title="Book Appointment">
+                                                    <i class="bi bi-calendar-plus-fill"></i>
+                                                </a>
+                                                <!-- Edit Button -->
+                                                <a href="/patients/edit/<%= patient.id %>" class="btn btn-sm btn-primary me-1" title="Edit Patient">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                                <!-- Delete Form -->
+                                                <form action="/patients/delete/<%= patient.id %>" method="POST" class="d-inline" id="delete-patient-form-<%= patient.id %>">
+                                                    <button type="button" class="btn btn-sm btn-danger" title="Delete Patient" 
+                                                            onclick="confirmDelete('patient', '<%= patient.id %>')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="6" class="text-center">No patients found.</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination Controls -->
+                    <% if (totalPages > 1) { %>
+                        <nav aria-label="Patient list navigation">
+                            <ul class="pagination pagination-sm justify-content-center">
+                                <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                    <a class="page-link" href="/patients?page=<%= currentPage - 1 %>&search=<%= searchQuery %>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <% 
+                                // Logic for limited pagination links (e.g., show 5 links around current)
+                                const maxLinks = 5;
+                                let startPage = Math.max(1, currentPage - Math.floor(maxLinks / 2));
+                                let endPage = Math.min(totalPages, startPage + maxLinks - 1);
+                                if (endPage - startPage + 1 < maxLinks) { // Adjust start if near end
+                                    startPage = Math.max(1, endPage - maxLinks + 1);
+                                }
+                                %>
+                                <% if (startPage > 1) { %>
+                                    <li class="page-item"><a class="page-link" href="/patients?page=1&search=<%= searchQuery %>">1</a></li>
+                                    <% if (startPage > 2) { %><li class="page-item disabled"><span class="page-link">...</span></li><% } %>
+                                <% } %>
+                                <% for (let i = startPage; i <= endPage; i++) { %>
+                                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                        <a class="page-link" href="/patients?page=<%= i %>&search=<%= searchQuery %>"><%= i %></a>
+                                    </li>
+                                <% } %>
+                                <% if (endPage < totalPages) { %>
+                                     <% if (endPage < totalPages - 1) { %><li class="page-item disabled"><span class="page-link">...</span></li><% } %>
+                                    <li class="page-item"><a class="page-link" href="/patients?page=<%= totalPages %>&search=<%= searchQuery %>"><%= totalPages %></a></li>
+                                <% } %>
+                                <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                    <a class="page-link" href="/patients?page=<%= currentPage + 1 %>&search=<%= searchQuery %>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    <% } %>
+                    <!-- End Pagination Controls -->
+                </div>
+            </div>
+        
+        </div> <!-- End container-fluid -->
+    </div> <!-- End page-content-wrapper -->
+</div> <!-- End wrapper -->
+
+<%- include('../partials/footer') %> 

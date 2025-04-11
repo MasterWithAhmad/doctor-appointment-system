@@ -1,0 +1,35 @@
+<%- include('partials/header', { title: title }) %>
+
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="card shadow" style="width: 25rem;">
+        <div class="card-body p-4">
+            <h3 class="card-title text-center mb-4">Login</h3>
+            
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="alert alert-danger" role="alert">
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <form action="/auth/login" method="POST">
+                <div class="mb-3">
+                    <label for="username" class="form-label"><i class="bi bi-person-fill me-2"></i>Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label"><i class="bi bi-lock-fill me-2"></i>Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-block">Login</button>
+                </div>
+            </form>
+            <p class="text-center mt-3 mb-0">
+                Don't have an account? <a href="/auth/register">Register here</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<% /* We don't include the sidebar here */ %>
+<%- include('partials/footer') %> 

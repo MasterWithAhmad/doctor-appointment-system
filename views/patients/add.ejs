@@ -1,0 +1,92 @@
+<%- include('../partials/header', { title: title }) %>
+
+<div class="d-flex" id="wrapper">
+
+    <%- include('../partials/sidebar', { username: username, activePage: activePage }) %>
+
+    <!-- Page Content Wrapper -->
+    <div id="page-content-wrapper">
+    
+        <%- include('../partials/navbar', { username: username }) %>
+
+        <!-- Page content-->
+        <div class="container-fluid p-4">
+            <h1 class="mt-4">Add New Patient</h1>
+            <p>Fill in the patient's details below.</p>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Patient Information</h6>
+                </div>
+                <div class="card-body">
+
+                    <% if (typeof error !== 'undefined' && error) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <%= error %>
+                        </div>
+                    <% } %>
+
+                    <form action="/patients/add" method="POST">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" value="<%= typeof formData !== 'undefined' ? formData.first_name : '' %>" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" value="<%= typeof formData !== 'undefined' ? formData.last_name : '' %>" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="date_of_birth" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" value="<%= typeof formData !== 'undefined' ? formData.date_of_birth : '' %>">
+                            </div>
+                             <div class="col-md-6 mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select" id="gender" name="gender">
+                                    <option value="" <%= (typeof formData === 'undefined' || !formData.gender) ? 'selected' : '' %>>Select Gender</option>
+                                    <option value="Male" <%= (typeof formData !== 'undefined' && formData.gender === 'Male') ? 'selected' : '' %>>Male</option>
+                                    <option value="Female" <%= (typeof formData !== 'undefined' && formData.gender === 'Female') ? 'selected' : '' %>>Female</option>
+                                    <option value="Other" <%= (typeof formData !== 'undefined' && formData.gender === 'Other') ? 'selected' : '' %>>Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="contact_number" class="form-label">Contact Number</label>
+                                <input type="tel" class="form-control" id="contact_number" name="contact_number" value="<%= typeof formData !== 'undefined' ? formData.contact_number : '' %>">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" value="<%= typeof formData !== 'undefined' ? formData.email : '' %>">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                             <label for="address" class="form-label">Address</label>
+                             <textarea class="form-control" id="address" name="address" rows="2"><%= typeof formData !== 'undefined' ? formData.address : '' %></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                             <label for="medical_history" class="form-label">Medical History / Notes</label>
+                             <textarea class="form-control" id="medical_history" name="medical_history" rows="4"><%= typeof formData !== 'undefined' ? formData.medical_history : '' %></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="bi bi-person-check-fill me-2"></i>Save Patient
+                        </button>
+                        <a href="/patients" class="btn btn-secondary">
+                             <i class="bi bi-x-circle me-2"></i>Cancel
+                        </a>
+                    </form>
+                </div>
+            </div>
+        
+        </div> <!-- End container-fluid -->
+    </div> <!-- End page-content-wrapper -->
+</div> <!-- End wrapper -->
+
+<%- include('../partials/footer') %> 
