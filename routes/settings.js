@@ -136,4 +136,25 @@ router.post('/update-info', (req, res) => {
     });
 });
 
+// POST /settings/delete-account - Delete the current user account
+router.post('/delete-account', (req, res) => {
+    const userId = req.session.userId;
+    if (!userId) {
+        req.flash('error_msg', 'You must be logged in to delete your account.');
+        return res.redirect('/settings');
+    }
+    const deleteSql = `DELETE FROM users WHERE id = ?`;
+    db.run(deleteSql, [userId], function(err) {
+        if (err) {
+            console.error('Error deleting user:', err.message);
+            req.flash('error_msg', 'Failed to delete account. Please try again.');
+            return res.redirect('/settings');
+        }
+        req.session.destroy(() => {
+            req.flash('success_msg', 'Your account has been deleted.');
+            res.redirect('/auth/login');
+        });
+    });
+});
+
 module.exports = router; 

@@ -147,6 +147,23 @@ function toggleEditUserInfo() {
                         </div>
                     </div>
 
+                    <!-- Danger Zone Card -->
+                    <div class="mb-5">
+                        <div class="card shadow border border-danger">
+                            <div class="card-header py-3 bg-danger bg-opacity-10 border-bottom border-danger">
+                                <h5 class="m-0 fw-bold text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Danger Zone</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-3">Deleting your account is irreversible. All your data will be permanently removed. Please proceed with caution.</p>
+                                <form id="deleteAccountForm" action="/settings/delete-account" method="POST">
+                                    <button type="button" class="btn btn-danger" onclick="confirmDeleteAccount()">
+                                        <i class="bi bi-trash me-2"></i>Delete Account
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
                 </div> <!-- End centered column -->
             </div> <!-- End row -->
         
@@ -188,5 +205,22 @@ function togglePasswordVisibility(fieldId, btn) {
         icon.classList.remove('bi-eye-slash');
         icon.classList.add('bi-eye');
     }
+}
+
+function confirmDeleteAccount() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'This action cannot be undone. Your account and all data will be permanently deleted.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete my account',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('deleteAccountForm').submit();
+        }
+    });
 }
 </script> 
