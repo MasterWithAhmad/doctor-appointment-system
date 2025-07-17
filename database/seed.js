@@ -140,3 +140,15 @@ function getFutureDate(daysToAdd) {
 
 // Run the seeder function
 seedDatabase(); 
+
+// Migration: Add last_password_change column if it doesn't exist
+db.run(`ALTER TABLE users ADD COLUMN last_password_change DATETIME`, (err) => {
+    if (err && !err.message.includes('duplicate column')) {
+        console.error('Migration error:', err.message);
+    } else if (!err) {
+        console.log('Migration: last_password_change column added to users table.');
+    } else {
+        console.log('Migration: last_password_change column already exists.');
+    }
+    db.close();
+}); 

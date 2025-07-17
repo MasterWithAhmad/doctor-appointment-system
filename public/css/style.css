@@ -166,4 +166,26 @@ body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
     color: #fff;
     background-color: #0d6efd; /* Bootstrap primary color */
     border-color: #0d6efd;
+}
+
+@media (max-width: 575.98px) {
+  .settings-page .card {
+    margin-bottom: 1.2rem;
+    padding: 0.2rem 0.2rem;
+  }
+  .settings-page h1 {
+    font-size: 1.5rem;
+    margin-top: 1rem;
+  }
+  .settings-page .card-header, .settings-page .card-body {
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+  }
+  .settings-page .form-label, .settings-page dt, .settings-page dd {
+    font-size: 0.98rem;
+  }
+  .settings-page .btn {
+    font-size: 0.95rem;
+    padding: 0.4rem 0.7rem;
+  }
 } 
