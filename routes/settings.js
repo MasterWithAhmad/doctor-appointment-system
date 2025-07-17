@@ -97,4 +97,43 @@ router.post('/change-password', async (req, res) => {
     });
 });
 
+// POST /settings/update-info - Handle user info (username/email) update
+router.post('/update-info', (req, res) => {
+    const userId = req.session.userId;
+    const { username, email } = req.body;
+
+    // Basic validation
+    if (!username || !email) {
+        req.flash('error_msg', 'Username and email are required.');
+        return res.redirect('/settings');
+    }
+
+    // Check if username or email already exists for another user
+    const checkSql = `SELECT id FROM users WHERE (username = ? OR email = ?) AND id != ?`;
+    db.get(checkSql, [username, email, userId], (err, existingUser) => {
+        if (err) {
+            console.error('Error checking for existing user:', err.message);
+            req.flash('error_msg', 'Database error. Please try again.');
+            return res.redirect('/settings');
+        }
+        if (existingUser) {
+            req.flash('error_msg', 'Username or email already in use.');
+            return res.redirect('/settings');
+        }
+
+        // Update user info
+        const updateSql = `UPDATE users SET username = ?, email = ? WHERE id = ?`;
+        db.run(updateSql, [username, email, userId], function(updateErr) {
+            if (updateErr) {
+                console.error('Error updating user info:', updateErr.message);
+                req.flash('error_msg', 'Failed to update user info. Please try again.');
+                return res.redirect('/settings');
+            }
+            req.session.username = username; // Update session username
+            req.flash('success_msg', 'User information updated successfully!');
+            res.redirect('/settings');
+        });
+    });
+});
+
 module.exports = router; 
