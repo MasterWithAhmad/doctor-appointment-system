@@ -112,13 +112,19 @@ function toggleEditUserInfo() {
                             </div>
                             <div class="card-body">
                                 <form action="/settings/change-password" method="POST">
-                                    <div class="mb-3">
+                                    <div class="mb-3 position-relative">
                                         <label for="currentPassword" class="form-label">Current Password</label>
-                                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                                        <input type="password" class="form-control pr-5" id="currentPassword" name="currentPassword" required>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm position-absolute top-50 end-0 translate-middle-y me-2" style="z-index:2;" tabindex="-1" onclick="togglePasswordVisibility('currentPassword', this)" aria-label="Show/hide current password">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="mb-3 position-relative">
                                         <label for="newPassword" class="form-label">New Password</label>
-                                        <input type="password" class="form-control" id="newPassword" name="newPassword" required oninput="checkPasswordStrength()">
+                                        <input type="password" class="form-control pr-5" id="newPassword" name="newPassword" required oninput="checkPasswordStrength()">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm position-absolute top-50 end-0 translate-middle-y me-2" style="z-index:2;" tabindex="-1" onclick="togglePasswordVisibility('newPassword', this)" aria-label="Show/hide new password">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
                                         <div class="mt-2">
                                             <div class="progress" style="height: 6px;">
                                                 <div id="passwordStrengthBar" class="progress-bar bg-danger" role="progressbar" style="width: 0%;"></div>
@@ -126,9 +132,12 @@ function toggleEditUserInfo() {
                                             <small id="passwordStrengthText" class="form-text text-muted"></small>
                                         </div>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="mb-3 position-relative">
                                         <label for="confirmPassword" class="form-label">Confirm New Password</label>
-                                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                        <input type="password" class="form-control pr-5" id="confirmPassword" name="confirmPassword" required>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm position-absolute top-50 end-0 translate-middle-y me-2" style="z-index:2;" tabindex="-1" onclick="togglePasswordVisibility('confirmPassword', this)" aria-label="Show/hide confirm password">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
                                     </div>
                                     <button type="submit" class="btn btn-warning">
                                         <i class="bi bi-key-fill me-2"></i>Update Password
@@ -165,5 +174,19 @@ function checkPasswordStrength() {
     bar.className = 'progress-bar ' + color;
     text.textContent = label;
     text.className = 'form-text ' + (score < 2 ? 'text-danger' : score < 4 ? 'text-warning' : 'text-success');
+}
+
+function togglePasswordVisibility(fieldId, btn) {
+    const input = document.getElementById(fieldId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
 }
 </script> 
