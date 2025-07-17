@@ -157,4 +157,60 @@ router.post('/delete-account', (req, res) => {
     });
 });
 
+// GET /settings/download-data - Download user data as CSV
+router.get('/download-data', async (req, res) => {
+    const userId = req.session.userId;
+    if (!userId) {
+        req.flash('error_msg', 'You must be logged in to download your data.');
+        return res.redirect('/settings');
+    }
+    try {
+        // Fetch user profile
+        const user = await new Promise((resolve, reject) => {
+            db.get('SELECT id, username, email, created_at, last_password_change FROM users WHERE id = ?', [userId], (err, row) => {
+                if (err) reject(err); else resolve(row);
+            });
+        });
+        // Fetch appointments
+        const appointments = await new Promise((resolve, reject) => {
+            db.all('SELECT id, patient_id, appointment_date, reason, status, created_at FROM appointments WHERE user_id = ?', [userId], (err, rows) => {
+                if (err) reject(err); else resolve(rows);
+            });
+        });
+        // Fetch patients
+        const patients = await new Promise((resolve, reject) => {
+            db.all('SELECT id, first_name, last_name, date_of_birth, gender, contact_number, email, address, medical_history, created_at FROM patients WHERE user_id = ?', [userId], (err, rows) => {
+                if (err) reject(err); else resolve(rows);
+            });
+        });
+        // Build CSV
+        let csv = '';
+        // Profile section
+        csv += 'Profile\n';
+        csv += 'id,username,email,created_at,last_password_change\n';
+        csv += `${user.id},${user.username},${user.email},${user.created_at},${user.last_password_change || ''}\n\n`;
+        // Appointments section
+        csv += 'Appointments\n';
+        csv += 'id,patient_id,appointment_date,reason,status,created_at\n';
+        appointments.forEach(a => {
+            csv += `${a.id},${a.patient_id},${a.appointment_date},"${(a.reason||'').replace(/"/g,'""')}",${a.status},${a.created_at}\n`;
+        });
+        csv += '\n';
+        // Patients section
+        csv += 'Patients\n';
+        csv += 'id,first_name,last_name,date_of_birth,gender,contact_number,email,address,medical_history,created_at\n';
+        patients.forEach(p => {
+            csv += `${p.id},"${(p.first_name||'').replace(/"/g,'""')}","${(p.last_name||'').replace(/"/g,'""')}",${p.date_of_birth||''},${p.gender||''},${p.contact_number||''},${p.email||''},"${(p.address||'').replace(/"/g,'""')}","${(p.medical_history||'').replace(/"/g,'""')}",${p.created_at}\n`;
+        });
+        // Send as file
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename="my_data.csv"');
+        res.send(csv);
+    } catch (err) {
+        console.error('Error generating CSV:', err);
+        req.flash('error_msg', 'Failed to generate CSV. Please try again.');
+        res.redirect('/settings');
+    }
+});
+
 module.exports = router; 

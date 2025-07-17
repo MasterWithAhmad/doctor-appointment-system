@@ -155,6 +155,9 @@ function toggleEditUserInfo() {
                             </div>
                             <div class="card-body">
                                 <p class="mb-3">Deleting your account is irreversible. All your data will be permanently removed. Please proceed with caution.</p>
+                                <a href="/settings/download-data" class="btn btn-outline-danger mb-3" download>
+                                    <i class="bi bi-download me-2"></i>Download My Data
+                                </a>
                                 <form id="deleteAccountForm" action="/settings/delete-account" method="POST">
                                     <button type="button" class="btn btn-danger" onclick="confirmDeleteAccount()">
                                         <i class="bi bi-trash me-2"></i>Delete Account
