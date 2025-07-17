@@ -1,5 +1,7 @@
 <%- include('../partials/header', { title: title }) %>
 
+<%- typeof flashScript !== 'undefined' && flashScript ? flashScript : '' %>
+
 <% /* Add at the top: Edit mode toggle script */ %>
 <script>
 function toggleEditUserInfo() {
@@ -34,9 +36,9 @@ function toggleEditUserInfo() {
                 <div class="col-lg-8 col-md-10">
 
                     <!-- User Information Card -->
-                    <div class="mb-4">
+                    <div class="mb-5">
                         <div class="card shadow">
-                            <div class="card-header py-3 d-flex align-items-center justify-content-between">
+                            <div class="card-header py-3 d-flex align-items-center justify-content-between bg-primary bg-opacity-10 border-bottom border-primary">
                                 <div class="d-flex align-items-center">
                                     <div class="me-3">
                                         <div style="width:56px;height:56px;border-radius:50%;background:#e3e6f0;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#4e73df;">
@@ -47,7 +49,7 @@ function toggleEditUserInfo() {
                                             <% } %>
                                         </div>
                                     </div>
-                                    <h6 class="m-0 font-weight-bold text-primary"><i class="bi bi-person-badge me-2"></i>User Information</h6>
+                                    <h5 class="m-0 fw-bold text-primary"><i class="bi bi-person-badge me-2"></i>User Information</h5>
                                 </div>
                                 <button class="btn btn-sm btn-outline-primary" onclick="toggleEditUserInfo()"><i class="bi bi-pencil"></i> Edit</button>
                             </div>
@@ -88,11 +90,16 @@ function toggleEditUserInfo() {
                         </div>
                     </div>
 
+                    <!-- Divider between cards -->
+                    <div class="my-4 text-center">
+                        <span class="text-secondary" style="font-size:1.2rem;"><i class="bi bi-three-dots"></i></span>
+                    </div>
+
                     <!-- Change Password Card -->
                     <div class="mb-4">
                         <div class="card shadow">
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary"><i class="bi bi-shield-lock me-2"></i>Change Password</h6>
+                            <div class="card-header py-3 bg-warning bg-opacity-10 border-bottom border-warning">
+                                <h5 class="m-0 fw-bold text-warning"><i class="bi bi-shield-lock me-2"></i>Change Password</h5>
                             </div>
                             <div class="card-body">
                                 <form action="/settings/change-password" method="POST">
