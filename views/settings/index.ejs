@@ -109,7 +109,13 @@ function toggleEditUserInfo() {
                                     </div>
                                     <div class="mb-3">
                                         <label for="newPassword" class="form-label">New Password</label>
-                                        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                                        <input type="password" class="form-control" id="newPassword" name="newPassword" required oninput="checkPasswordStrength()">
+                                        <div class="mt-2">
+                                            <div class="progress" style="height: 6px;">
+                                                <div id="passwordStrengthBar" class="progress-bar bg-danger" role="progressbar" style="width: 0%;"></div>
+                                            </div>
+                                            <small id="passwordStrengthText" class="form-text text-muted"></small>
+                                        </div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="confirmPassword" class="form-label">Confirm New Password</label>
@@ -131,3 +137,24 @@ function toggleEditUserInfo() {
 </div> <!-- End wrapper -->
 
 <%- include('../partials/footer') %> 
+
+<script>
+function checkPasswordStrength() {
+    const pwd = document.getElementById('newPassword').value;
+    const bar = document.getElementById('passwordStrengthBar');
+    const text = document.getElementById('passwordStrengthText');
+    let score = 0;
+    if (pwd.length >= 8) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[a-z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+    let percent = [0, 25, 50, 75, 100][score];
+    let color = ['bg-danger','bg-warning','bg-info','bg-primary','bg-success'][score];
+    let label = ['Too short','Weak','Fair','Good','Strong'][score];
+    bar.style.width = percent + '%';
+    bar.className = 'progress-bar ' + color;
+    text.textContent = label;
+    text.className = 'form-text ' + (score < 2 ? 'text-danger' : score < 4 ? 'text-warning' : 'text-success');
+}
+</script> 
