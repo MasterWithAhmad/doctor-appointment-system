@@ -13,7 +13,7 @@ router.use(ensureAuthenticated);
 router.get('/', (req, res) => {
     const userId = req.session.userId;
     // Fetch current user info (excluding password hash)
-    const sql = `SELECT id, username, email, created_at FROM users WHERE id = ?`;
+    const sql = `SELECT id, username, email, created_at, last_password_change FROM users WHERE id = ?`;
     db.get(sql, [userId], (err, user) => {
         if (err || !user) {
             console.error('Error fetching user for settings:', err?.message);
@@ -76,7 +76,7 @@ router.post('/change-password', async (req, res) => {
             const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
 
             // Update the password in the database
-            const updateSql = `UPDATE users SET password = ? WHERE id = ?`;
+            const updateSql = `UPDATE users SET password = ?, last_password_change = CURRENT_TIMESTAMP WHERE id = ?`;
             db.run(updateSql, [hashedNewPassword, userId], function(updateErr) {
                 if (updateErr) {
                     console.error('Error updating password:', updateErr.message);

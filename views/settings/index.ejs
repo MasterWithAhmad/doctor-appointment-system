@@ -63,6 +63,8 @@ function toggleEditUserInfo() {
                                         <dd class="col-sm-8"><%= userInfo.email %></dd>
                                         <dt class="col-sm-4">Member Since:</dt>
                                         <dd class="col-sm-8"><%= new Date(userInfo.created_at).toLocaleDateString() %></dd>
+                                        <dt class="col-sm-4">Last Password Change:</dt>
+                                        <dd class="col-sm-8"><%= userInfo.last_password_change ? new Date(userInfo.last_password_change).toLocaleDateString() : 'Never' %></dd>
                                     </dl>
                                 </div>
                                 <!-- Edit Form (hidden by default) -->
