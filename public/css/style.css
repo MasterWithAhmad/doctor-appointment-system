@@ -49,6 +49,53 @@ body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
     }
 }
 
+/* --- Sidebar fixed for desktop --- */
+@media (min-width: 768px) {
+  #wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+  }
+  #sidebar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 15rem;
+    height: 100vh;
+    z-index: 1030;
+    margin-left: 0;
+    border-right: 1px solid #e3e6f0;
+  }
+  #page-content-wrapper {
+    margin-left: 15rem;
+    width: calc(100% - 15rem);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+}
+
+/* Mobile: sidebar overlays as before */
+@media (max-width: 767.98px) {
+  #sidebar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 15rem;
+    height: 100vh;
+    z-index: 1030;
+    margin-left: -15rem;
+    transition: margin 0.25s ease-out;
+  }
+  body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
+    margin-left: 0;
+  }
+  #page-content-wrapper {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
 /* Simple card border colors (match dashboard examples) */
 .border-left-primary {
     border-left: .25rem solid #4e73df!important;
