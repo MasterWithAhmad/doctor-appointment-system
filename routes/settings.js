@@ -157,6 +157,34 @@ router.post('/delete-account', (req, res) => {
     });
 });
 
+// POST /settings/factory-reset - Delete all user data except the user account
+router.post('/factory-reset', (req, res) => {
+    const userId = req.session.userId;
+    if (!userId) {
+        req.flash('error_msg', 'You must be logged in to perform a factory reset.');
+        return res.redirect('/settings');
+    }
+    // Delete appointments and patients for this user
+    db.serialize(() => {
+        db.run('DELETE FROM appointments WHERE user_id = ?', [userId], (err) => {
+            if (err) {
+                console.error('Error deleting appointments:', err.message);
+                req.flash('error_msg', 'Failed to delete appointments.');
+                return res.redirect('/settings');
+            }
+            db.run('DELETE FROM patients WHERE user_id = ?', [userId], (err2) => {
+                if (err2) {
+                    console.error('Error deleting patients:', err2.message);
+                    req.flash('error_msg', 'Failed to delete patients.');
+                    return res.redirect('/settings');
+                }
+                req.flash('success_msg', 'All your data has been erased. Your account remains.');
+                res.redirect('/settings');
+            });
+        });
+    });
+});
+
 // GET /settings/download-data - Download user data as CSV
 router.get('/download-data', async (req, res) => {
     const userId = req.session.userId;

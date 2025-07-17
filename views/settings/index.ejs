@@ -158,6 +158,11 @@ function toggleEditUserInfo() {
                                 <a href="/settings/download-data" class="btn btn-outline-danger mb-3" download>
                                     <i class="bi bi-download me-2"></i>Download My Data
                                 </a>
+                                <form id="factoryResetForm" action="/settings/factory-reset" method="POST">
+                                    <button type="button" class="btn btn-warning mb-3" onclick="confirmFactoryReset()">
+                                        <i class="bi bi-arrow-counterclockwise me-2"></i>Factory Reset
+                                    </button>
+                                </form>
                                 <form id="deleteAccountForm" action="/settings/delete-account" method="POST">
                                     <button type="button" class="btn btn-danger" onclick="confirmDeleteAccount()">
                                         <i class="bi bi-trash me-2"></i>Delete Account
@@ -223,6 +228,23 @@ function confirmDeleteAccount() {
     }).then((result) => {
         if (result.isConfirmed) {
             document.getElementById('deleteAccountForm').submit();
+        }
+    });
+}
+
+function confirmFactoryReset() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'This will erase all your appointments and patients, but keep your account. This cannot be undone.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#f59e42',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, factory reset',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('factoryResetForm').submit();
         }
     });
 }
