@@ -126,7 +126,33 @@ body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
 }
 
 .card.shadow {
-    box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15)!important;
+    box-shadow: 0 .25rem 2rem 0 rgba(58,59,69,.18)!important;
+    border-radius: 1rem!important;
+    transition: box-shadow 0.2s, transform 0.2s;
+    padding: 0.25rem 0.5rem;
+}
+.card.shadow:hover {
+    box-shadow: 0 .5rem 2.5rem 0 rgba(58,59,69,.22)!important;
+    transform: translateY(-2px) scale(1.01);
+}
+
+.card-header {
+    border-top-left-radius: 1rem!important;
+    border-top-right-radius: 1rem!important;
+    padding-top: 1.1rem;
+    padding-bottom: 1.1rem;
+}
+
+.card-body {
+    border-bottom-left-radius: 1rem!important;
+    border-bottom-right-radius: 1rem!important;
+    padding-top: 1.2rem;
+    padding-bottom: 1.2rem;
+}
+
+/* Add extra spacing between cards on settings page */
+.settings-page .card {
+    margin-bottom: 2.5rem;
 }
 
 /* Ensure logout link in sidebar stays at bottom */
